@@ -48,8 +48,8 @@ function changeIsActive($isActive)
                                 <tr>
                                     <td><?php echo $key += 1 ?></td>
                                     <td><img src="uploads/<?php echo $row['image']?>" alt="" width="100"></td>
-                                    <td><?php echo $row['title']?></td>
                                     <td><?php echo $row['name']?></td>
+                                    <td><?php echo $row['title']?></td>
                                     <td><?php echo $row['is_active']?></td>
                                     <td><?php echo changeIsActive($row['is_active'])?></td>
                                     <td>

@@ -8,9 +8,9 @@ if (isset($_GET['edit'])) {
     $id = $_GET['edit'];
     $query = mysqli_query($koneksi, "SELECT * FROM blogs WHERE id ='$id'");
     $rowEdit = mysqli_fetch_assoc($query);
-    $title = "Edit Tentang Kami";
+    $title = "Edit Blog";
 } else {
-    $title = "Tambah Tentang Kami";
+    $title = "Tambah Blog";
 }
 
 //query untuk menghapus blog
@@ -22,7 +22,7 @@ if (isset($_GET['delete'])) {
     unlink("uploads/" . $image_name);
     $delete = mysqli_query($koneksi, "DELETE FROM blogs WHERE id='$id'");
     if ($delete) {
-        header("location:?page=blog&tambah=berhasil");
+        header("location:?page=blog&hapus=berhasil");
     }
 }
 
@@ -30,6 +30,9 @@ if (isset($_POST['simpan'])) {
     $title = $_POST['title'];
     $content = $_POST['content'];
     $is_active = $_POST['is_active'];
+    $penulis = $_SESSION['NAME'];
+    $id_category = $_POST['id_category'];
+    $tags = $_POST['tags'];
 
     if (!empty($_FILES['image']['name'])) {
         $image = $_FILES['image']['name'];
@@ -53,18 +56,23 @@ if (isset($_POST['simpan'])) {
             echo "file can't be uploaded";
             die;
         }
+        $update = "UPDATE blogs SET title='$title', content='$content', is_active='$is_active', image='$image_name', penulis='$penulis', id_category='$id_category', tags='$tags' WHERE id='$id'";
+        // dengan gambar
+    }else{
+        $update = "UPDATE blogs SET title='$title', content='$content', is_active='$is_active', penulis='$penulis', id_category='$id_category', tags='$tags' WHERE id='$id'";
+        // tanpa gambar
     }
 
     //ini query update
     if ($id) {
-        $update = mysqli_query($koneksi, "UPDATE blogs SET title='$title', content='$content', is_active='$is_active', image='$image_name' WHERE id='$id'");
+        $update = mysqli_query($koneksi, $update);
         if ($update) {
             header("location:?page=blog&ubah=berhasil");
         }
     } else {
 
-        $insert = mysqli_query($koneksi, "INSERT INTO blogs (title, content, is_active, image)
-        VALUES('$title', '$content','$is_active', '$image_name')");
+        $insert = mysqli_query($koneksi, "INSERT INTO blogs (id_category, title, content, image, is_active, penulis, tags)
+        VALUES('$id_category', '$title', '$content', '$image_name', '$is_active', '$penulis', '$tags')");
         if ($insert) {
             header("location:?page=blog&tambah=berhasil");
         }
@@ -92,15 +100,15 @@ $rowCategories   = mysqli_fetch_all($queryCategories, MYSQLI_ASSOC);
                         <div class="mb-3">
                             <label for="" class="form-label">Gambar</label>
                             <input type="file"
-                                name="image" required>
+                                name="image">
                             <small class="text-muted">* Size : 1920 * 1088</small>
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Kategori</label>
-                            <select name="id_category" id="" class="form-control">
+                            <select name="id_category" id="" class="form-control" required>
                                 <option value="">Pilih Kategori</option>
                             <?php foreach($rowCategories as $rowCategories):?>                            
-                                <option value="><?php echo $rowCategories['id']?>"><?php echo $rowCategories['name']?></option>
+                                <option value="<?php echo $rowCategories['id']?>"><?php echo $rowCategories['name']?></option>
                             <?php endforeach ?>                            
                             </select>
                         </div>
@@ -112,6 +120,10 @@ $rowCategories   = mysqli_fetch_all($queryCategories, MYSQLI_ASSOC);
                         <div class="mb-3">
                             <label for="">Isi</label>
                             <textarea name="content" id="summernote" class="form-control"><?php echo ($id) ? $rowEdit['content'] : '' ?></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Tags</label>
+                            <input type="text" id="tags" name="tags" class="form-control" placeholder="Masukkan tags"value="">
                         </div>
                     </div>
                 </div>
