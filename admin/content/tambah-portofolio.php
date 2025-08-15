@@ -6,33 +6,35 @@ use Dom\Mysql;
 $id = isset($_GET['edit']) ? $_GET['edit'] : '';
 if (isset($_GET['edit'])) {
     $id = $_GET['edit'];
-    $query = mysqli_query($koneksi, "SELECT * FROM blogs WHERE id ='$id'");
+    $query = mysqli_query($koneksi, "SELECT * FROM portofolios WHERE id ='$id'");
     $rowEdit = mysqli_fetch_assoc($query);
-    $title = "Edit Blog";
+    $title = "Edit portofolio";
 } else {
-    $title = "Tambah Blog";
+    $title = "Tambah portofolio";
 }
 
 //query untuk menghapus blog
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    $queryGambar = mysqli_query($koneksi, "SELECT id, image FROM blogs WHERE id='$id'");
+    $queryGambar = mysqli_query($koneksi, "SELECT id, image FROM portofolios WHERE id='$id'");
     $rowGambar = mysqli_fetch_assoc($queryGambar);
     $image_name = $rowGambar['image'];
     unlink("uploads/" . $image_name);
-    $delete = mysqli_query($koneksi, "DELETE FROM blogs WHERE id='$id'");
+    $delete = mysqli_query($koneksi, "DELETE FROM portofolios WHERE id='$id'");
     if ($delete) {
-        header("location:?page=blog&hapus=berhasil");
+        header("location:?page=portofolio&hapus=berhasil");
     }
 }
 
 if (isset($_POST['simpan'])) {
     $title = $_POST['title'];
     $content = $_POST['content'];
+    $client_name = $_POST['client_name'];
+    $project_date = $_POST['project_date'];
+    $project_url= $_POST['project_url'];
     $is_active = $_POST['is_active'];
-    $penulis = $_SESSION['NAME'];
     $id_category = $_POST['id_category'];
-    $tags = $_POST['tags'];
+  
 
     if (!empty($_FILES['image']['name'])) {
         $image = $_FILES['image']['name'];
@@ -56,10 +58,10 @@ if (isset($_POST['simpan'])) {
             echo "file can't be uploaded";
             die;
         }
-        $update = "UPDATE blogs SET title='$title', content='$content', is_active='$is_active', image='$image_name', penulis='$penulis', id_category='$id_category', tags='$tags' WHERE id='$id'";
+        $update = "UPDATE portofolios SET title='$title', content='$content', is_active='$is_active', image='$image_name', client_name='$client_name', id_category='$id_category', project_date='$project_date', project_url='$project_url' WHERE id='$id'";
         // dengan gambar
     }else{
-        $update = "UPDATE blogs SET title='$title', content='$content', is_active='$is_active', penulis='$penulis', id_category='$id_category', tags='$tags' WHERE id='$id'";
+        $update = "UPDATE portofolios SET title='$title', content='$content', is_active='$is_active', client_name='$client_name', id_category='$id_category', project_date='$project_date', project_url='$project_date' WHERE id='$id'";
         // tanpa gambar
     }
 
@@ -67,19 +69,19 @@ if (isset($_POST['simpan'])) {
     if ($id) {
         $update = mysqli_query($koneksi, $update);
         if ($update) {
-            header("location:?page=blog&ubah=berhasil");
+            header("location:?page=portofolio&ubah=berhasil");
         }
     } else {
 
-        $insert = mysqli_query($koneksi, "INSERT INTO blogs (id_category, title, content, image, is_active, penulis, tags)
-        VALUES('$id_category', '$title', '$content', '$image_name', '$is_active', '$penulis', '$tags')");
+        $insert = mysqli_query($koneksi, "INSERT INTO portofolios (id_category, title, content, image, is_active, client_name, project_date, project_url)
+        VALUES('$id_category', '$title', '$content', '$image_name', '$is_active', '$client_name', '$project_date', '$project_url')");
         if ($insert) {
-            header("location:?page=blog&tambah=berhasil");
+            header("location:?page=portofolio&tambah=berhasil");
         }
     }
 }
 
-$queryCategories = mysqli_query($koneksi, "SELECT * FROM categories WHERE type='blog' ORDER BY id ASC");
+$queryCategories = mysqli_query($koneksi, "SELECT * FROM categories WHERE type='portofolios' ORDER BY id ASC");
 $rowCategories   = mysqli_fetch_all($queryCategories, MYSQLI_ASSOC);
 
 ?>
@@ -114,7 +116,7 @@ $rowCategories   = mysqli_fetch_all($queryCategories, MYSQLI_ASSOC);
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Judul</label>
-                            <input type="text" class="form-control" name="title" placeholder="Masukkan judul blog"
+                            <input type="text" class="form-control" name="title" placeholder="Masukkan judul portofolio"
                                 required value="<?php echo ($id) ? $rowEdit['title'] : '' ?>">
                         </div>
                         <div class="mb-3">
@@ -122,10 +124,17 @@ $rowCategories   = mysqli_fetch_all($queryCategories, MYSQLI_ASSOC);
                             <textarea name="content" id="summernote" class="form-control"><?php echo ($id) ? $rowEdit['content'] : '' ?></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="" class="form-label">Tags</label>
-                            <input type="text" id="tags" name="tags" class="form-control" placeholder="Masukkan tags"value="">
+                            <label for="" class="form-label">Nama Client</label>
+                            <input type="text"  name="client_name" class="form-control" value="<?php echo ($id) ? $rowEdit['client_name']: ''?>">
                         </div>
-                    </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Tanggal Projek</label>
+                            <input type="date"  name="project_date" class="form-control" value="<?php echo ($id) ? $rowEdit['project_date']: ''?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">URL Projek</label>
+                            <input type="text"  name="project_url" class="form-control" value="<?php echo ($id) ? $rowEdit['project_url']: ''?>">
+                        </div>
                 </div>
                 
             </div>

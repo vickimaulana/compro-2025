@@ -1,5 +1,5 @@
 <?php
-  $queryBlogs = mysqli_query($koneksi, "SELECT * FROM blogs ORDER BY id DESC");
+  $queryBlogs = mysqli_query($koneksi, "SELECT * FROM blogs WHERE is_active = 1 ORDER BY id DESC");
   $rowBlogs  = mysqli_fetch_all($queryBlogs, MYSQLI_ASSOC);
 ?>
 <!-- Page Title -->
